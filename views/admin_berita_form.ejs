@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor Terminal | MarketWave</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0a0f1e;
+      --card-bg: #161e31;
+      --accent-gold: #fbbf24;
+      --pure-white: #ffffff;
+      --info-cyan: #22d3ee;
+      --border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--pure-white);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .premium-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+    }
+
+    /* Form Styling */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .form-label-gold {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select {
+      background-color: #0f172a;
+      border: 1px solid var(--border-color);
+      color: white !important;
+      padding: 12px;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: #0f172a;
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Button Styling */
+    .btn-gold {
+      background-color: var(--accent-gold);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      padding: 10px 25px;
+    }
+
+    .btn-gold:hover {
+      background-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline-gold {
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    .btn-outline-gold:hover {
+      background-color: var(--accent-gold);
+      color: #000;
+    }
+
+    /* Helper text */
+    .text-helper {
+      font-size: 0.75rem;
+      color: var(--info-cyan);
+      margin-top: 5px;
+    }
+
+    .preview-img {
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body class="pb-5">
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="premium-title mb-0">
+          <%= mode === "edit" ? "Edit Data" : "Entry Data" %> Berita
+        </h4>
+        <div class="text-white-50 small">
+          Login as: <span style="color: var(--info-cyan)"><%= pengguna.nama %></span>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/admin/berita" class="btn btn-outline-gold btn-sm px-3">← Database</a>
+        <form method="POST" action="/logout" class="m-0">
+          <button class="btn btn-outline-danger btn-sm px-3">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert alert-danger border-0 shadow-sm" style="background: rgba(220, 53, 69, 0.2); color: #ff8e98;">
+        <strong>Error:</strong> <%= error %>
+      </div>
+    <% } %>
+
+    <div class="card p-4">
+      <form
+        method="POST"
+        action="<%= mode === 'edit' ? ('/admin/berita/' + berita._id + '/edit') : '/admin/berita/tambah' %>"
+        enctype="multipart/form-data"
+      >
+
+        <div class="mb-4">
+          <label class="form-label-gold">Headline / Judul Berita</label>
+          <input
+            type="text"
+            name="judul"
+            class="form-control form-control-lg"
+            placeholder="Masukkan judul yang menarik..."
+            value="<%= berita?.judul || '' %>"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label-gold">Ringkasan Singkat</label>
+          <textarea name="ringkasan" class="form-control" rows="2" placeholder="Tuliskan intisari berita di sini..."><%= berita?.ringkasan || '' %></textarea>
+          <div class="text-helper">Muncul pada kartu berita di halaman depan.</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label-gold">Isi Narasi Lengkap</label>
+          <textarea name="isi" class="form-control" rows="10" placeholder="Tulis detail berita lengkap di sini..."><%= berita?.isi || '' %></textarea>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-5">
+            <label class="form-label-gold">Status Publikasi</label>
+            <select name="status" class="form-select">
+              <option value="publish" <%= (berita?.status || 'publish') === 'publish' ? 'selected' : '' %>>PUBLISH (Live on Site)</option>
+              <option value="draft" <%= (berita?.status || 'publish') === 'draft' ? 'selected' : '' %>>DRAFT (Hidden)</option>
+            </select>
+            <div class="text-helper">Gunakan 'Draft' jika konten belum siap tayang.</div>
+          </div>
+
+          <div class="col-md-7">
+            <label class="form-label-gold">Visual / Gambar Utama</label>
+            <input type="file" name="gambar" class="form-control" accept="image/*" <%= mode === "tambah" ? "required" : "" %> />
+            <div class="text-helper">
+              <%= mode === "tambah" ? "Wajib mengunggah gambar utama." : "Biarkan kosong jika tetap menggunakan gambar lama." %>
+            </div>
+
+            <% if (mode === "edit" && berita?.gambar) { %>
+              <div class="mt-3 p-2 bg-dark rounded border border-secondary d-inline-block">
+                <div class="small mb-2 text-white-50">Current Image Preview:</div>
+                <img src="<%= berita.gambar %>" class="preview-img" style="max-width: 300px; height: auto;">
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <hr style="border-color: var(--border-color);">
+
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn btn-gold text-uppercase shadow">
+            <%= mode === "edit" ? "Update Record" : "Launch News" %>
+          </button>
+          <a href="/admin/berita" class="btn btn-outline-secondary text-uppercase px-4">Batal</a>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="mt-4 text-center opacity-50 small">
+      Secure News Management Terminal v2.1
+    </div>
+  </div>
+
+</body>
+</html>

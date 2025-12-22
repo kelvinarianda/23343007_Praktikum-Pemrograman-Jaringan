@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar Akun | MarketWave Financial Terminal</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0a0f1e;
+      --card-bg: #161e31;
+      --accent-gold: #fbbf24;
+      --pure-white: #ffffff;
+      --info-cyan: #22d3ee;
+      --border-color: rgba(251, 191, 36, 0.4);
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--pure-white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: radial-gradient(circle at 90% 10%, rgba(251, 191, 36, 0.08) 0%, transparent 40%);
+    }
+
+    .premium-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--accent-gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .register-container {
+      max-width: 1000px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+
+    .benefit-section {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .form-section {
+      padding: 40px;
+    }
+
+    .form-label-gold {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      background-color: #0f172a;
+      border: 1px solid var(--border-color);
+      color: white;
+      padding: 10px 12px;
+    }
+
+    .form-control:focus {
+      background-color: #0f172a;
+      border-color: var(--accent-gold);
+      color: white;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+    }
+
+    .btn-gold {
+      background-color: var(--accent-gold);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      padding: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-gold:hover {
+      background-color: #f59e0b;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+    }
+
+    .text-gold-light {
+      color: rgba(251, 191, 36, 0.85);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .benefit-icon {
+      color: var(--accent-gold);
+      margin-right: 15px;
+      font-size: 1.2rem;
+    }
+
+    .terminal-note {
+      border-left: 2px solid var(--info-cyan);
+      padding-left: 15px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <div class="card">
+      <div class="row g-0">
+        <div class="col-lg-5 benefit-section d-none d-lg-block">
+          <h2 class="premium-title mb-4">MarketWave</h2>
+          <h5 class="mb-4" style="color: var(--info-cyan); font-weight: 700;">MEMBERSHIP PERKS:</h5>
+          
+          <div class="benefit-item">
+            <span class="benefit-icon">✦</span>
+            <div>
+              <strong style="color: var(--pure-white);">Advanced ChatBot AI</strong>
+              <p class="text-gold-light">Konsultasi ekonomi 24/7 dan ringkasan pasar instan melalui asisten AI kami.</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <span class="benefit-icon">✦</span>
+            <div>
+              <strong style="color: var(--pure-white);">Automated Email Reports</strong>
+              <p class="text-gold-light">Dapatkan rekap harian harga emas (XAU), Bitcoin, IHSG, dan kurs USD langsung ke inbox Anda.</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <span class="benefit-icon">✦</span>
+            <div>
+              <strong style="color: var(--pure-white);">Full Dashboard Access</strong>
+              <p class="text-gold-light">Pantau pergerakan harga global dan berita ekonomi dalam satu terminal premium.</p>
+            </div>
+          </div>
+
+          <div class="terminal-note">
+            <div class="small fw-bold mb-1" style="color: var(--info-cyan);">SECURITY NOTE:</div>
+            <p class="text-gold-light small mb-0">Semua data terenkripsi dan aman dalam jaringan terminal MarketWave.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-7 form-section">
+          <div class="mb-4 text-center text-lg-start">
+            <h3 class="fw-bold text-white">Create Account</h3>
+            <p style="color: var(--accent-gold); font-size: 0.9rem;">Daftar sekarang untuk membuka fitur analisis penuh.</p>
+          </div>
+
+          <% if (error) { %>
+            <div class="alert alert-danger py-2 small" style="background: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ff8e98;">
+              <%= error %>
+            </div>
+          <% } %>
+
+          <form method="POST" action="/register">
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label-gold">Nama Lengkap</label>
+                <input name="nama" class="form-control" placeholder="John Doe" value="<%= form?.nama || '' %>" required />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label-gold">Alamat Email</label>
+              <input name="email" type="email" class="form-control" placeholder="john@example.com" value="<%= form?.email || '' %>" required />
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label-gold">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Min. 6 Karakter" required />
+              </div>
+              <div class="col-md-6 mb-4">
+                <label class="form-label-gold">Konfirmasi Password</label>
+                <input name="password2" type="password" class="form-control" placeholder="Ulangi Password" required />
+              </div>
+            </div>
+
+            <button class="btn btn-gold w-100 mb-3 text-uppercase">Buka Akun Terminal</button>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary">
+              <a href="/" class="btn btn-sm btn-outline-gold px-3">Beranda</a>
+              <div class="small" style="color: white;">
+                Sudah punya akun? <a href="/login" class="text-decoration-none fw-bold" style="color: var(--accent-gold)">Login Disini</a>
+              </div>
+            </div>
+          </form>
+          
+          <div class="mt-4 text-center">
+            <p class="text-gold-light small" style="font-style: italic;">"AI bersifat edukatif, bukan saran investasi finansial langsung."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
