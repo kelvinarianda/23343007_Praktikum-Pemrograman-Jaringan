@@ -21,31 +21,22 @@ const emailRoutes = require("./routes/email");
 const marketRoutes = require("./routes/marketRoutes");
 const adminBeritaRoutes = require("./routes/adminBerita");
 
-// Socket
 const { pasangSocketChatbot } = require("./sockets/chatbot");
 
-// =======================
-// INIT APP & SERVER
-// =======================
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  addTrailingSlash: false,
+  cors: { origin: "*" }
+});
 
 // =======================
-// VIEW ENGINE
+// VIEW ENGINE & STATIC
 // =======================
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 
-// =======================
-// STATIC FILES
-// =======================
-app.use(express.static(path.join(__dirname, "public"))); 
-// termasuk /uploads/berita
-
-// =======================
-// BODY PARSER
-// =======================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -57,27 +48,31 @@ app.use(
     secret: process.env.SESSION_SECRET || "rahasia",
     resave: false,
     saveUninitialized: false,
+    // Tambahan untuk kestabilan di serverless
+    cookie: { secure: process.env.NODE_ENV === "production" }
   })
 );
 
 // =======================
-// API ROUTES
+// KONEKSI DATABASE (DI LUAR MAIN)
 // =======================
-app.use("/api/public", publicApiRoutes); // guest + user
-app.use("/api/market", marketRoutes);    // (opsional / lama)
+// Vercel sering melakukan 'cold start', jadi kita panggil koneksi di sini
+konekDatabase(process.env.MONGO_URI).then(() => {
+    console.log("🗄️ Database Terhubung");
+    seedPenggunaDemo(); // Jalankan seed jika perlu
+}).catch(err => console.error("❌ Gagal konek DB:", err));
 
 // =======================
-// WEB ROUTES
+// API & WEB ROUTES
 // =======================
-app.use(publicRoutes);       // "/" homepage guest
-app.use(authRoutes);         // /login /register /logout
-app.use(dashboardRoutes);    // /dashboard (login)
-app.use(adminBeritaRoutes);  // /admin/berita (admin)
-app.use(emailRoutes);        // /email (login)
+app.use("/api/public", publicApiRoutes);
+app.use("/api/market", marketRoutes);
+app.use(publicRoutes);
+app.use(authRoutes);
+app.use(dashboardRoutes);
+app.use(adminBeritaRoutes);
+app.use(emailRoutes);
 
-// =======================
-// SOCKET
-// =======================
 pasangSocketChatbot(io);
 
 // =======================
@@ -87,60 +82,55 @@ async function seedPenggunaDemo() {
   const adminEmail = "admin@marketbot.local";
   const userEmail = "user@marketbot.local";
 
-  const [adaAdmin, adaUser] = await Promise.all([
-    Pengguna.findOne({ email: adminEmail }),
-    Pengguna.findOne({ email: userEmail }),
-  ]);
+  try {
+    const [adaAdmin, adaUser] = await Promise.all([
+      Pengguna.findOne({ email: adminEmail }),
+      Pengguna.findOne({ email: userEmail }),
+    ]);
 
-  if (!adaAdmin) {
-    const hash = await bcrypt.hash("admin123", 10);
-    await Pengguna.create({
-      nama: "Admin MarketBot",
-      email: adminEmail,
-      kata_sandi_hash: hash,
-      peran: "admin",
-    });
-    console.log("✅ Seed admin: admin@marketbot.local / admin123");
-  }
+    if (!adaAdmin) {
+      const hash = await bcrypt.hash("admin123", 10);
+      await Pengguna.create({
+        nama: "Admin MarketBot",
+        email: adminEmail,
+        kata_sandi_hash: hash,
+        peran: "admin",
+      });
+    }
 
-  if (!adaUser) {
-    const hash = await bcrypt.hash("user123", 10);
-    await Pengguna.create({
-      nama: "User MarketBot",
-      email: userEmail,
-      kata_sandi_hash: hash,
-      peran: "user",
-    });
-    console.log("✅ Seed user: user@marketbot.local / user123");
+    if (!adaUser) {
+      const hash = await bcrypt.hash("user123", 10);
+      await Pengguna.create({
+        nama: "User MarketBot",
+        email: userEmail,
+        kata_sandi_hash: hash,
+        peran: "user",
+      });
+    }
+  } catch (e) {
+    console.log("Seed skipped or error.");
   }
 }
 
-// =======================
-// 404 HANDLER
-// =======================
 app.use((req, res) => {
   res.status(404).send("Halaman tidak ditemukan (404).");
 });
 
-// =======================
-// ERROR HANDLER
-// =======================
 app.use((err, req, res, next) => {
   console.error("❌ ERROR:", err);
   res.status(500).send("Terjadi kesalahan pada server.");
 });
 
 // =======================
-// MAIN
+// EKSPOR APP UNTUK VERCEL
 // =======================
-async function main() {
-  await konekDatabase(process.env.MONGO_URI);
-  await seedPenggunaDemo();
-
-  const port = Number(process.env.PORT || 3000);
-  server.listen(port, () => {
-    console.log(`🚀 Server berjalan di http://localhost:${port}`);
-  });
+// PENTING: Jangan gunakan server.listen() jika di lingkungan Vercel
+if (process.env.NODE_ENV !== 'production') {
+    const port = Number(process.env.PORT || 3000);
+    server.listen(port, () => {
+      console.log(`🚀 Local Server berjalan di http://localhost:${port}`);
+    });
 }
 
-main();
+// Baris ini adalah kunci agar Vercel bisa menjalankan Express Anda
+module.exports = app;
